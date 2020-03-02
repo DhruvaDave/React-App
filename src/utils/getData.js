@@ -2,7 +2,7 @@ import axios from 'axios';
 import { serverUrl } from '../const';
 
 export const getList = async () => {
-  const response = await axios.get(`${serverUrl}/disconnect_app`);
+  const response = await axios.get(`${serverUrl}/got/search`);
   return response.data;
 };
 
