@@ -1,32 +1,33 @@
-import React, { Component } from 'react'
-import {debounce} from 'lodash';
-import './App.css';
-import {countData} from './routes';
-
-
+import React, { Component } from "react";
+import { debounce } from "lodash";
+import { getCount } from './utils/getData';
+import "./App.css";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       searchTerm: props.searchTerm,
-      allcount: countData
+      totalCount: 0
     };
   }
 
-  onChange = debounce((searchTerm) => {
-    console.log(searchTerm);
+  async componentDidMount() {
+    const response = await getCount();
+    this.setState({ totalCount: response.count });
+  }
+
+  onChange = debounce(async searchTerm => {
     this.setState({ searchTerm });
-   }, 500);
+  }, 500);
 
   render() {
-    const { searchTerm } = this.state;
-    console.log(searchTerm);
-    console.log("---this.state-----",this.state.allcount);
+    const { totalCount } = this.state;
     return (
       <div>
+        {totalCount}
         <p>{this.state.searchTerm}</p> here
-        <input onChange={ e => this.onChange(e.target.value)} />
+        <input onChange={e => this.onChange(e.target.value)} />
         <h2>There are {this.state.allcount} Battles!</h2>
       </div>
     );
