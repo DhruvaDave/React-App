@@ -19,10 +19,9 @@ class App extends Component {
 
   render() {
     const { searchTerm } = this.state;
-    console.log(searchTerm);
     return (
       <div>
-        <input onChange={ e => this.onChange(e.target.value)} />
+        <input valu={searchTerm} onChange={ e => this.onChange(e.target.value)} />
       </div>
     );
   }
