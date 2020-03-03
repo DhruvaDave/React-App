@@ -1,4 +1,19 @@
 .card-container {
   width: 400px;
   height: 500px;
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 20px;
+  text-align: center;
+}
+
+.fighter-name-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.fighter-description {
+  text-align: center;
 }
