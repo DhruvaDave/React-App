@@ -58,7 +58,7 @@ class App extends Component {
             onChange={this.onChange}
             onSelect={this.onSelect}
           />
-          <button onClick={this.onSubmitSearch}>Search</button>
+          <button onClick={this.onSubmitSearch} className="search-btn">Search</button>
         </div>
         <ResultData warList={searchResult} />
       </div>
