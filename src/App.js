@@ -1,59 +1,66 @@
 import React, { Component } from "react";
-import { debounce } from "lodash";
-import { getCount,getList } from './utils/getData';
-import Autocomplete from "./utils/Autocomplete";
+import { getList, getWarData } from "./utils/getData";
+import Autocomplete from 'react-autocomplete';
+import ResultData from './component/ResultData';
 import "./App.css";
-require("./utils/style.css");
-
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      searchTerm: props.searchTerm,
-      totalCount: 0,
-      allDataList:[],
-      value: ''
-    };
-  }
+  state = {
+    searchTerm: "",
+    allDataList: [],
+    value: '',
+    searchResult: []
+  };
 
   async componentDidMount() {
-    const response = await getCount();
-    this.setState({ totalCount: response.numOfDocs });
-    console.log("---response.count---",response);
-    console.log("---response.count---",response.numOfDocs);
-
-    const response_data = await getList();
-    this.setState({ allDataList: response_data.AllData });
-    console.log("---response_data---",response_data);
-    console.log("---response_data--list---",response_data.AllData);
+    const response = await getList();
+    const locationList = response.AllData.map((location) => ({
+      label: location
+    }));
+    // NOTE: I am assumming that I have a limited set of location, so loading those all in the fist time only
+    this.setState({ allDataList: locationList });
   }
 
+  onChange = (e) => {
+    this.setState({ searchTerm: e.target.value });
+  };
 
-  onChange = debounce(async searchTerm => {
-    this.setState({ searchTerm });
-  }, 500);
+  onSelect = (searchTerm) => {
+    this.setState({ searchTerm }, () => {
+      this.onSubmitSearch();
+    });
+  }
 
-  onSubmitSearch (e)  {
-    console.log("-------seaarch-----",e);
-    // console.log(React.findDOMNode(Autocomplete.refs.search_val).value);
+  onSubmitSearch = async () => {
+    const { searchTerm } = this.state;
+    const response = await getWarData(searchTerm);
+    this.setState({ searchResult: response.results });
   }
 
   render() {
-    // const { totalCount } = this.state;
+    const { searchTerm, searchResult } = this.state;
+    const items = this.state.allDataList.filter((item) => item.label.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
     return (
-      <div>
-        {/* {totalCount} */}
-        <p>{this.state.searchTerm}</p> here
-        <input onChange={e => this.onChange(e.target.value)} />
-        <h2>There are {this.state.totalCount} Battles!</h2>
-        
-        <Autocomplete suggestions= {this.state.allDataList} />
-        {/* console.log(React.findDOMNode(this.refs.cpDev1).value); */}
-        {/* <Autocomplete suggestions= {this.state.allDataList} onChange={(event, value) => this.setState({ value }) } onSelect={ value => this.setState({ value }) }/> */}
-        {/* <p>{Autocomplete.sss}</p>  */}
-        <button onClick={(e) => this.onSubmitSearch(this.state.value)} >Search</button> 
-        {/* <button onClick={e => this.state.searchTerm}>Search</button>  */}
+      <div className="container">
+        <div className="search-container">
+          <Autocomplete
+            getItemValue={item => item.label}
+            items={items}
+            renderItem={(item, isHighlighted) => (
+              <div
+                style={{ background: isHighlighted ? "lightgray" : "white" }}
+                key={item.label}
+              >
+                {item.label}
+              </div>
+            )}
+            value={searchTerm}
+            onChange={this.onChange}
+            onSelect={this.onSelect}
+          />
+          <button onClick={this.onSubmitSearch}>Search</button>
+        </div>
+        <ResultData warList={searchResult} />
       </div>
     );
   }
